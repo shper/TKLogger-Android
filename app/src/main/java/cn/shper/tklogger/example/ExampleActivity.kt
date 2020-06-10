@@ -3,6 +3,7 @@ package cn.shper.tklogger.example
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import cn.shper.tklogger.TKLogger
+import cn.shper.tklogger.destination.TKLogDiskDestination
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -17,6 +18,7 @@ class ExampleActivity : AppCompatActivity() {
     setContentView(R.layout.activity_main)
 
     TKLogger.setup()
+    TKLogger.addDestination(TKLogDiskDestination(this))
 
     start_btn.setOnClickListener {
       TKLogger.d("AAA")

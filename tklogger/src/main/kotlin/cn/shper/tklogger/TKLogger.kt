@@ -3,7 +3,9 @@ package cn.shper.tklogger
 import cn.shper.tklogger.destination.TKLogBaseDestination
 import cn.shper.tklogger.destination.TKLogConsoleDestination
 import cn.shper.tklogger.filter.TKLogBaseFilter
+import cn.shper.tklogger.thread.ThreadPoolUtils
 import java.util.*
+import java.util.concurrent.ThreadPoolExecutor
 import kotlin.collections.ArrayList
 
 /**
@@ -17,13 +19,18 @@ object TKLogger {
 
   var minLevel = TKLogLevel.VERBOSE
 
-  var destinations = ArrayList<TKLogBaseDestination>()
-  var filters = ArrayList<TKLogBaseFilter>()
+  var threadPool: ThreadPoolExecutor? = null
 
-  fun setup(tag: String = "TKLogger", level: TKLogLevel = TKLogLevel.VERBOSE) {
-    loggerTag = tag
+  private var destinations = ArrayList<TKLogBaseDestination>()
 
-    minLevel = level
+  private var filters = ArrayList<TKLogBaseFilter>()
+
+  fun setup(tag: String = "TKLogger",
+            level: TKLogLevel = TKLogLevel.VERBOSE,
+            threadPool: ThreadPoolExecutor = ThreadPoolUtils.createThreadPool()) {
+    this.loggerTag = tag
+    this.minLevel = level
+    this.threadPool = threadPool
 
     addDestination(TKLogConsoleDestination())
   }
@@ -98,7 +105,16 @@ object TKLogger {
     // dispatch the logs to destination
     destinations.forEach { destination ->
       if (destination.asynchronously) {
-        // TODO
+        threadPool?.execute {
+          destination.handlerLog(level,
+                                 message,
+                                 internalMessage,
+                                 threadName,
+                                 clazzName,
+                                 functionName,
+                                 line)
+        }
+      } else {
         destination.handlerLog(level,
                                message,
                                internalMessage,
@@ -106,8 +122,6 @@ object TKLogger {
                                clazzName,
                                functionName,
                                line)
-      } else {
-        // TODO
       }
     }
   }
@@ -122,15 +136,17 @@ object TKLogger {
   }
 
   private fun getStackTraceElement(): StackTraceElement {
-    val temp = Thread.currentThread().stackTrace
+    val stackTraces = Thread.currentThread().stackTrace
     // Java function stack first element is 'getStackTrace'
     // Kotlin function stack first element is 'getThreadStackTrace', second is 'getStackTrace'
     // TODO 找到 TKLogger 的最先一个的调用栈 的 上一个栈 就是调用方的 函数
-    val stackTraceElement: StackTraceElement = if (temp[0].methodName == "getThreadStackTrace") {
-      Thread.currentThread().stackTrace[6]
-    } else {
-      Thread.currentThread().stackTrace[5]
+    var index = 0
+    stackTraces.forEachIndexed { index, stackTraceElement ->
+
+      return 
     }
+
+    outside@ val stackTraceElement: StackTraceElement = stackTraces[index]
 
     var clazzName = stackTraceElement.className
     clazzName = clazzName.substring(clazzName.lastIndexOf(".") + 1)
