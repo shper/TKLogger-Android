@@ -28,8 +28,8 @@ class LevelString {
 @Keep
 class LevelColor {
   var verbose = "💜"    // silver
-  var debug = "💙"      // green
-  var info = "💚"       // blue
+  var debug = "💚"      // green
+  var info = "💙"       // blue
   var warning = "💛"    // yellow
   var error = "💔"      // red
 }

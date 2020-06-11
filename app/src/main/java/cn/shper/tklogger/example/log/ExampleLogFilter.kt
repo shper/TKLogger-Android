@@ -1,4 +1,4 @@
-package cn.shper.tklogger.example
+package cn.shper.tklogger.example.log
 
 import cn.shper.tklogger.TKLogLevel
 import cn.shper.tklogger.filter.TKLogBaseFilter
@@ -20,7 +20,7 @@ class ExampleLogFilter: TKLogBaseFilter() {
                             functionName: String): FilterResult {
 
     return super.handleFilter(level,
-                              "AA$message",
+                              message,
                               internalMessage,
                               threadName,
                               clazzName,

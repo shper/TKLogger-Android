@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">TKLogger-Android</string>
+    <string name="app_name">TKLogger Example Android</string>
+
+    <string name="verbose_level">Verbose Level Log</string>
+    <string name="info_level">Info Level Log</string>
+    <string name="debug_level">Debug Level Log</string>
+    <string name="warning_level">Warning Level Log</string>
+    <string name="error_level">Error Level Log</string>
 </resources>

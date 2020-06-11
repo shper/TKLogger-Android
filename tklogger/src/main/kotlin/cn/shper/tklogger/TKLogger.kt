@@ -81,21 +81,21 @@ object TKLogger {
   /** Inner Function */
 
   private fun dispatchLog(level: TKLogLevel,
-                          message: String? = null,
-                          internalMessage: String? = null) {
+                          msg: String? = null,
+                          interMsg: String? = null) {
 
     if (level.ordinal < minLevel.ordinal) {
       return
     }
 
     val threadName = getThreadName()
-    var dispatchMessage: String? = message
-    var dispatchInternalMessage: String? = internalMessage
-    var stackTraceElement = getCallerStackTraceElement()
+    var message: String? = msg
+    var internalMessage: String? = interMsg
+    val stackTraceElement = getCallerStackTraceElement()
     var clazzName: String = stackTraceElement.className
     var fileName: String = stackTraceElement.fileName
     var functionName: String = stackTraceElement.methodName
-    var line: Int = stackTraceElement.lineNumber
+    val line: Int = stackTraceElement.lineNumber
 
     // Use filters to process logs
     filters.forEach { filter ->
@@ -111,11 +111,11 @@ object TKLogger {
         return
       }
 
-      dispatchMessage = filterResult.message
-      dispatchInternalMessage = filterResult.internalMessage
+      message = filterResult.message
+      internalMessage = filterResult.internalMessage
       clazzName = filterResult.clazzName ?: ""
-      fileName = filterResult.clazzName ?: ""
-      functionName = filterResult.clazzName ?: ""
+      fileName = filterResult.fileName ?: ""
+      functionName = filterResult.functionName ?: ""
     }
 
     // dispatch the logs to destination
@@ -123,8 +123,8 @@ object TKLogger {
       if (destination.asynchronously) {
         threadPool?.execute {
           destination.handlerLog(level,
-                                 dispatchMessage,
-                                 dispatchInternalMessage,
+                                 message,
+                                 internalMessage,
                                  threadName,
                                  clazzName,
                                  fileName,
@@ -133,8 +133,8 @@ object TKLogger {
         }
       } else {
         destination.handlerLog(level,
-                               dispatchMessage,
-                               dispatchInternalMessage,
+                               message,
+                               internalMessage,
                                threadName,
                                clazzName,
                                fileName,
