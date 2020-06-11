@@ -1,5 +1,6 @@
 package cn.shper.tklogger.destination
 
+import androidx.annotation.Keep
 import cn.shper.tklogger.LevelColor
 import cn.shper.tklogger.LevelString
 import cn.shper.tklogger.TKLogLevel
@@ -13,6 +14,7 @@ import java.util.*
  * EMail : me@shper.cn
  * Date : 2020/6/10
  */
+@Keep
 abstract class TKLogBaseDestination {
 
   open var format = "%Dyyyy-MM-dd HH:mm:ss %C %L/%T %t %c.%f:%l - %M %I"

@@ -33,8 +33,6 @@ object TKLogger {
     this.loggerTag = tag
     this.minLevel = level
     this.threadPool = threadPool
-
-    addDestination(TKLogConsoleDestination())
   }
 
   /** Destination */
@@ -91,16 +89,33 @@ object TKLogger {
     }
 
     val threadName = getThreadName()
-
-    val stackTraceElement = getCallerStackTraceElement()
-    val clazzName: String = stackTraceElement.className
-    val fileName: String = stackTraceElement.fileName
-    val functionName: String = stackTraceElement.methodName
-    val line: Int = stackTraceElement.lineNumber
+    var dispatchMessage: String? = message
+    var dispatchInternalMessage: String? = internalMessage
+    var stackTraceElement = getCallerStackTraceElement()
+    var clazzName: String = stackTraceElement.className
+    var fileName: String = stackTraceElement.fileName
+    var functionName: String = stackTraceElement.methodName
+    var line: Int = stackTraceElement.lineNumber
 
     // Use filters to process logs
     filters.forEach { filter ->
-      // TODO
+      val filterResult = filter.handleFilter(level,
+                                             message,
+                                             internalMessage,
+                                             threadName,
+                                             clazzName,
+                                             fileName,
+                                             functionName)
+
+      if (filterResult.isIgnore) {
+        return
+      }
+
+      dispatchMessage = filterResult.message
+      dispatchInternalMessage = filterResult.internalMessage
+      clazzName = filterResult.clazzName ?: ""
+      fileName = filterResult.clazzName ?: ""
+      functionName = filterResult.clazzName ?: ""
     }
 
     // dispatch the logs to destination
@@ -108,8 +123,8 @@ object TKLogger {
       if (destination.asynchronously) {
         threadPool?.execute {
           destination.handlerLog(level,
-                                 message,
-                                 internalMessage,
+                                 dispatchMessage,
+                                 dispatchInternalMessage,
                                  threadName,
                                  clazzName,
                                  fileName,
@@ -118,8 +133,8 @@ object TKLogger {
         }
       } else {
         destination.handlerLog(level,
-                               message,
-                               internalMessage,
+                               dispatchMessage,
+                               dispatchInternalMessage,
                                threadName,
                                clazzName,
                                fileName,
@@ -147,9 +162,9 @@ object TKLogger {
         if (stackTraceElement.className.startsWith(TKLogger.javaClass.name)
           && index < stackTraces.size
           && !stackTraces[index + 1].className.startsWith(TKLogger.javaClass.name)) {
-            callerStackTrace = stackTraces[index + 1]
-            return@breaking
-          }
+          callerStackTrace = stackTraces[index + 1]
+          return@breaking
+        }
       }
     }
 
