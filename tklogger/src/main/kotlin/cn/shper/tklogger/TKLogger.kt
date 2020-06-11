@@ -1,5 +1,6 @@
 package cn.shper.tklogger
 
+import androidx.annotation.Keep
 import cn.shper.tklogger.destination.TKLogBaseDestination
 import cn.shper.tklogger.destination.TKLogConsoleDestination
 import cn.shper.tklogger.filter.TKLogBaseFilter
@@ -13,6 +14,7 @@ import kotlin.collections.ArrayList
  * EMail : me@shper.cn
  * Date : 2020/6/10
  */
+@Keep
 object TKLogger {
 
   var loggerTag = "TKLogger"
@@ -80,8 +82,6 @@ object TKLogger {
 
   /** Inner Function */
 
-  // 2020-06-10 16:26:54 💚 D/TKLogger RootViewController.debugLogBtnClickFun():145 - This is the debug level log.
-
   private fun dispatchLog(level: TKLogLevel,
                           message: String? = null,
                           internalMessage: String? = null) {
@@ -92,8 +92,9 @@ object TKLogger {
 
     val threadName = getThreadName()
 
-    val stackTraceElement = getStackTraceElement()
+    val stackTraceElement = getCallerStackTraceElement()
     val clazzName: String = stackTraceElement.className
+    val fileName: String = stackTraceElement.fileName
     val functionName: String = stackTraceElement.methodName
     val line: Int = stackTraceElement.lineNumber
 
@@ -111,6 +112,7 @@ object TKLogger {
                                  internalMessage,
                                  threadName,
                                  clazzName,
+                                 fileName,
                                  functionName,
                                  line)
         }
@@ -120,6 +122,7 @@ object TKLogger {
                                internalMessage,
                                threadName,
                                clazzName,
+                               fileName,
                                functionName,
                                line)
       }
@@ -135,26 +138,31 @@ object TKLogger {
     return threadName
   }
 
-  private fun getStackTraceElement(): StackTraceElement {
+  private fun getCallerStackTraceElement(): StackTraceElement {
     val stackTraces = Thread.currentThread().stackTrace
-    // Java function stack first element is 'getStackTrace'
-    // Kotlin function stack first element is 'getThreadStackTrace', second is 'getStackTrace'
-    // TODO 找到 TKLogger 的最先一个的调用栈 的 上一个栈 就是调用方的 函数
-    var index = 0
-    stackTraces.forEachIndexed { index, stackTraceElement ->
+    var callerStackTrace: StackTraceElement? = null
 
-      return 
+    run breaking@{
+      stackTraces.forEachIndexed { index, stackTraceElement ->
+        if (stackTraceElement.className.startsWith(TKLogger.javaClass.name)
+          && index < stackTraces.size
+          && !stackTraces[index + 1].className.startsWith(TKLogger.javaClass.name)) {
+            callerStackTrace = stackTraces[index + 1]
+            return@breaking
+          }
+      }
     }
 
-    outside@ val stackTraceElement: StackTraceElement = stackTraces[index]
+    var clazzName = callerStackTrace?.className
+    clazzName = clazzName?.substring(clazzName.lastIndexOf(".") + 1)
 
-    var clazzName = stackTraceElement.className
-    clazzName = clazzName.substring(clazzName.lastIndexOf(".") + 1)
+    var fileName = callerStackTrace?.fileName
+    fileName = fileName?.substring(0, fileName.lastIndexOf("."))
 
     return StackTraceElement(clazzName,
-                             stackTraceElement.methodName + "()",
-                             stackTraceElement.fileName,
-                             stackTraceElement.lineNumber)
+                             callerStackTrace?.methodName + "()",
+                             fileName,
+                             callerStackTrace?.lineNumber ?: 0)
   }
 
 }

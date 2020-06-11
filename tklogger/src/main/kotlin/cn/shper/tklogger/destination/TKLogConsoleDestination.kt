@@ -12,13 +12,14 @@ import cn.shper.tklogger.TKLogger
  */
 class TKLogConsoleDestination : TKLogBaseDestination() {
 
-  override var format = "%C %t %N.%F:%l - %M %I"
+  override var format = "%C %t %c.%f:%l - %M %I"
 
   override fun handlerLog(level: TKLogLevel,
                           message: String?,
                           internalMessage: String?,
                           threadName: String,
                           clazzName: String,
+                          fileName: String,
                           functionName: String,
                           line: Int): String? {
 
@@ -27,6 +28,7 @@ class TKLogConsoleDestination : TKLogBaseDestination() {
                                   internalMessage,
                                   threadName,
                                   clazzName,
+                                  fileName,
                                   functionName,
                                   line) ?: ""
 

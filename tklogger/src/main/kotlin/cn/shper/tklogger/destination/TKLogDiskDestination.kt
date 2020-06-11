@@ -27,6 +27,7 @@ class TKLogDiskDestination(private val context: Context) : TKLogBaseDestination(
                           internalMessage: String?,
                           threadName: String,
                           clazzName: String,
+                          fileName: String,
                           functionName: String,
                           line: Int): String? {
 
@@ -35,6 +36,7 @@ class TKLogDiskDestination(private val context: Context) : TKLogBaseDestination(
                                   internalMessage,
                                   threadName,
                                   clazzName,
+                                  fileName,
                                   functionName,
                                   line)
     logStr?.let {

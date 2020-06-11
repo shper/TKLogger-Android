@@ -15,7 +15,7 @@ import java.util.*
  */
 abstract class TKLogBaseDestination {
 
-  open var format = "%Dyyyy-MM-dd HH:mm:ss %C %L/%T %t %N.%F:%l - %M %I"
+  open var format = "%Dyyyy-MM-dd HH:mm:ss %C %L/%T %t %c.%f:%l - %M %I"
 
   /// runs in own serial background thread for better performance
   open var asynchronously = true
@@ -31,9 +31,18 @@ abstract class TKLogBaseDestination {
                       internalMessage: String? = null,
                       threadName: String,
                       clazzName: String,
+                      fileName: String,
                       functionName: String,
                       line: Int): String? {
-    return formatLog(level, message, internalMessage, threadName, clazzName, functionName, line)
+
+    return formatLog(level,
+                     message,
+                     internalMessage,
+                     threadName,
+                     clazzName,
+                     fileName,
+                     functionName,
+                     line)
   }
 
   fun formatLog(level: TKLogLevel,
@@ -41,6 +50,7 @@ abstract class TKLogBaseDestination {
                 internalMessage: String? = null,
                 threadName: String,
                 clazzName: String,
+                fileName: String,
                 functionName: String,
                 line: Int): String? {
 
@@ -55,37 +65,40 @@ abstract class TKLogBaseDestination {
       val remainingPhrase = phrase.subSequence(1, phrase.length)
 
       when (phrasePrefix) {
-        'i' -> {
+        'i' -> { // ignore
           text += remainingPhrase
-        } // ignore
-        'D' -> {
+        }
+        'D' -> { // Date
           text += formatDate(remainingPhrase)
         }
-        'C' -> {
+        'C' -> { // LevelColor
           text += paddedString(colorForLevel(level), remainingPhrase.toString())
         }
-        'L' -> {
+        'L' -> { // Level
           text += paddedString(levelWord(level), remainingPhrase.toString())
         }
-        'T' -> {
+        'T' -> { // Tag
           text += paddedString(loggerTag(), remainingPhrase.toString())
         }
-        't' -> {
+        't' -> { // threadName
           text += paddedString(threadName, remainingPhrase.toString())
         }
-        'N' -> {
+        'c' -> { // clazzName
           text += paddedString(clazzName, remainingPhrase.toString())
         }
-        'F' -> {
+        'F' -> { // fileName
+          text += paddedString(fileName, remainingPhrase.toString())
+        }
+        'f' -> { // functionName
           text += paddedString(functionName, remainingPhrase.toString())
         }
-        'l' -> {
+        'l' -> { // line
           text += paddedString(line.toString(), remainingPhrase.toString())
         }
-        'M' -> {
+        'M' -> { // Message
           text += paddedString(message ?: "", remainingPhrase.toString())
         }
-        'I' -> {
+        'I' -> { // internal
           text += paddedString(internalMessage ?: "", remainingPhrase.toString())
         }
         else -> {
