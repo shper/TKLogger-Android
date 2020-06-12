@@ -9,7 +9,7 @@ import cn.shper.tklogger.model.FilterResult
  * EMail : me@shper.cn
  * Date : 2020/6/11
  */
-class ExampleLogFilter: TKLogBaseFilter() {
+class ReleaseLogFilter: TKLogBaseFilter() {
 
   override fun handleFilter(level: TKLogLevel,
                             message: String?,
@@ -19,13 +19,23 @@ class ExampleLogFilter: TKLogBaseFilter() {
                             fileName: String,
                             functionName: String): FilterResult {
 
-    return super.handleFilter(level,
-                              message,
-                              internalMessage,
-                              threadName,
-                              clazzName,
-                              fileName,
-                              functionName)
+    // Filter out debug messages
+    var isIgnore = false
+    if (level <= TKLogLevel.DEBUG) {
+      isIgnore = true
+    }
+
+    // Filter out internal messages
+    val emptyMessage = null
+
+    return FilterResult().apply {
+      this.isIgnore = isIgnore
+      this.message = message
+      this.internalMessage = emptyMessage
+      this.clazzName = clazzName
+      this.fileName = fileName
+      this.functionName = functionName
+    }
   }
 
 }

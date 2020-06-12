@@ -4,7 +4,8 @@ import android.app.Application
 import cn.shper.tklogger.TKLogger
 import cn.shper.tklogger.destination.TKLogConsoleDestination
 import cn.shper.tklogger.destination.TKLogDiskDestination
-import cn.shper.tklogger.example.log.ExampleLogFilter
+import cn.shper.tklogger.example.log.ReleaseLogFilter
+import java.sql.BatchUpdateException
 
 /**
  * Author : Shper
@@ -16,9 +17,17 @@ class ExampleApplication: Application() {
   override fun onCreate() {
     super.onCreate()
 
+    setupTKLogger()
+  }
+
+  private fun setupTKLogger() {
     // Init to TKLogger
     TKLogger.setup()
-    TKLogger.addFilter(ExampleLogFilter())
+
+    if (!BuildConfig.DEBUG) {
+      TKLogger.addFilter(ReleaseLogFilter())
+    }
+
     TKLogger.addDestination(TKLogConsoleDestination())
     TKLogger.addDestination(TKLogDiskDestination(this))
   }
