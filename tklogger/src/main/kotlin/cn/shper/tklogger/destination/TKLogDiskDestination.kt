@@ -77,4 +77,12 @@ class TKLogDiskDestination(private val context: Context) : TKLogBaseDestination(
     }
   }
 
+  override fun hashCode(): Int {
+    return this.javaClass.name.hashCode()
+  }
+
+  override fun equals(other: Any?): Boolean {
+    return this.hashCode() == other.hashCode()
+  }
+
 }

@@ -8,6 +8,7 @@ import cn.shper.tklogger.thread.ThreadPoolUtils
 import java.util.*
 import java.util.concurrent.ThreadPoolExecutor
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 /**
  * Author : Shper
@@ -23,9 +24,9 @@ object TKLogger {
 
   var threadPool: ThreadPoolExecutor? = null
 
-  private var destinations = ArrayList<TKLogBaseDestination>()
+  private var destinations = HashSet<TKLogBaseDestination>()
 
-  private var filters = ArrayList<TKLogBaseFilter>()
+  private var filters = HashSet<TKLogBaseFilter>()
 
   fun setup(tag: String = "TKLogger",
             level: TKLogLevel = TKLogLevel.VERBOSE,
