@@ -4,6 +4,7 @@ import android.util.Log
 import cn.shper.tklogger.LevelColor
 import cn.shper.tklogger.TKLogLevel
 import cn.shper.tklogger.TKLogger
+import cn.shper.tklogger.model.TKLogModel
 
 /**
  * Author : Shper
@@ -14,25 +15,10 @@ class TKLogConsoleDestination : TKLogBaseDestination() {
 
   override var format = "%C %t %c.%f:%l - %M %I"
 
-  override fun handlerLog(level: TKLogLevel,
-                          message: String?,
-                          internalMessage: String?,
-                          threadName: String,
-                          clazzName: String,
-                          fileName: String,
-                          functionName: String,
-                          line: Int): String? {
+  override fun handlerLog(tkLog: TKLogModel) {
 
-    val logStr = super.handlerLog(level,
-                                  message,
-                                  internalMessage,
-                                  threadName,
-                                  clazzName,
-                                  fileName,
-                                  functionName,
-                                  line) ?: ""
-
-    when (level) {
+    val logStr = formatLog(tkLog) ?: ""
+    when (tkLog.level) {
       TKLogLevel.VERBOSE -> {
         Log.v(TKLogger.loggerTag, logStr)
       }
@@ -49,8 +35,6 @@ class TKLogConsoleDestination : TKLogBaseDestination() {
         Log.e(TKLogger.loggerTag, logStr)
       }
     }
-
-    return null
   }
 
   override fun hashCode(): Int {

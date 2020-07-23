@@ -2,8 +2,8 @@ package cn.shper.tklogger
 
 import androidx.annotation.Keep
 import cn.shper.tklogger.destination.TKLogBaseDestination
-import cn.shper.tklogger.destination.TKLogConsoleDestination
 import cn.shper.tklogger.filter.TKLogBaseFilter
+import cn.shper.tklogger.model.TKLogModel
 import cn.shper.tklogger.thread.ThreadPoolUtils
 import java.util.*
 import java.util.concurrent.ThreadPoolExecutor
@@ -89,58 +89,35 @@ object TKLogger {
       return
     }
 
-    val threadName = getThreadName()
-    var message: String? = msg
-    var internalMessage: String? = interMsg
     val stackTraceElement = getCallerStackTraceElement()
-    var clazzName: String = stackTraceElement.className
-    var fileName: String = stackTraceElement.fileName
-    var functionName: String = stackTraceElement.methodName
-    val line: Int = stackTraceElement.lineNumber
+    var tkLog = TKLogModel().apply {
+      this.level = level
+      this.threadName = getThreadName()
+      this.message = msg
+      this.internalMessage = interMsg
+      this.clazzName = stackTraceElement.className
+      this.fileName = stackTraceElement.fileName
+      this.functionName = stackTraceElement.methodName
+      this.lineNum = stackTraceElement.lineNumber
+    }
 
     // Use filters to process logs
     filters.forEach { filter ->
-      val filterResult = filter.handleFilter(level,
-                                             message,
-                                             internalMessage,
-                                             threadName,
-                                             clazzName,
-                                             fileName,
-                                             functionName)
+      tkLog = filter.handleFilter(tkLog)
 
-      if (filterResult.isIgnore) {
+      if (tkLog.isIgnore) {
         return
       }
-
-      message = filterResult.message
-      internalMessage = filterResult.internalMessage
-      clazzName = filterResult.clazzName ?: ""
-      fileName = filterResult.fileName ?: ""
-      functionName = filterResult.functionName ?: ""
     }
 
     // dispatch the logs to destination
     destinations.forEach { destination ->
       if (destination.asynchronously) {
         threadPool?.execute {
-          destination.handlerLog(level,
-                                 message,
-                                 internalMessage,
-                                 threadName,
-                                 clazzName,
-                                 fileName,
-                                 functionName,
-                                 line)
+          destination.handlerLog(tkLog)
         }
       } else {
-        destination.handlerLog(level,
-                               message,
-                               internalMessage,
-                               threadName,
-                               clazzName,
-                               fileName,
-                               functionName,
-                               line)
+        destination.handlerLog(tkLog)
       }
     }
   }

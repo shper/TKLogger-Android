@@ -5,6 +5,7 @@ import cn.shper.tklogger.LevelColor
 import cn.shper.tklogger.LevelString
 import cn.shper.tklogger.TKLogLevel
 import cn.shper.tklogger.TKLogger
+import cn.shper.tklogger.model.TKLogModel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,33 +29,9 @@ abstract class TKLogBaseDestination {
   /// set custom log level colors for each level
   open var levelColor = LevelColor()
 
-  open fun handlerLog(level: TKLogLevel,
-                      message: String? = null,
-                      internalMessage: String? = null,
-                      threadName: String,
-                      clazzName: String,
-                      fileName: String,
-                      functionName: String,
-                      line: Int): String? {
+  abstract fun handlerLog(tkLog: TKLogModel)
 
-    return formatLog(level,
-                     message,
-                     internalMessage,
-                     threadName,
-                     clazzName,
-                     fileName,
-                     functionName,
-                     line)
-  }
-
-  fun formatLog(level: TKLogLevel,
-                message: String? = null,
-                internalMessage: String? = null,
-                threadName: String,
-                clazzName: String,
-                fileName: String,
-                functionName: String,
-                line: Int): String? {
+  fun formatLog(tkLog: TKLogModel): String? {
 
     var text = ""
     val phrases = ("%i${this.format}").split("%")
@@ -74,34 +51,34 @@ abstract class TKLogBaseDestination {
           text += formatDate(remainingPhrase)
         }
         'C' -> { // LevelColor
-          text += paddedString(colorForLevel(level), remainingPhrase.toString())
+          text += paddedString(colorForLevel(tkLog.level), remainingPhrase.toString())
         }
         'L' -> { // Level
-          text += paddedString(levelWord(level), remainingPhrase.toString())
+          text += paddedString(levelWord(tkLog.level), remainingPhrase.toString())
         }
         'T' -> { // Tag
           text += paddedString(loggerTag(), remainingPhrase.toString())
         }
         't' -> { // threadName
-          text += paddedString(threadName, remainingPhrase.toString())
+          text += paddedString(tkLog.threadName, remainingPhrase.toString())
         }
         'c' -> { // clazzName
-          text += paddedString(clazzName, remainingPhrase.toString())
+          text += paddedString(tkLog.clazzName, remainingPhrase.toString())
         }
         'F' -> { // fileName
-          text += paddedString(fileName, remainingPhrase.toString())
+          text += paddedString(tkLog.fileName, remainingPhrase.toString())
         }
         'f' -> { // functionName
-          text += paddedString(functionName, remainingPhrase.toString())
+          text += paddedString(tkLog.functionName, remainingPhrase.toString())
         }
         'l' -> { // line
-          text += paddedString(line.toString(), remainingPhrase.toString())
+          text += paddedString(tkLog.lineNum?.toString(), remainingPhrase.toString())
         }
         'M' -> { // Message
-          text += paddedString(message ?: "", remainingPhrase.toString())
+          text += paddedString(tkLog.message, remainingPhrase.toString())
         }
         'I' -> { // internal
-          text += paddedString(internalMessage ?: "", remainingPhrase.toString())
+          text += paddedString(tkLog.internalMessage, remainingPhrase.toString())
         }
         else -> {
           text += remainingPhrase
@@ -112,7 +89,7 @@ abstract class TKLogBaseDestination {
     return text
   }
 
-  fun paddedString(str1: String, str2: String): String {
+  fun paddedString(str1: String? = "", str2: String): String {
     var str = str1 + str2
     if (str == " ") {
       str = ""

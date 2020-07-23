@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 ext {
-    version_name = "1.0.0"
+    version_name = "0.0.1"
     version_code = 100000
 }
 
@@ -48,14 +48,14 @@ dependencies {
 apply plugin: 'tk-maven'
 tkmaven {
     groupId = "cn.shper"
-    artifactId = "tk-logger"
+    artifactId = "tklogger"
     version = version_name
 
     bintray {
         repo = "maven"
         userOrg = "shper"
         name = "TKLogger"
-        desc = "Shper's Plugin for Gradle"
+        desc = "Simple and powerful logger for android"
         websiteUrl = "https://www.shper.cn"
         vcsUrl = "https://github.com/shper"
 

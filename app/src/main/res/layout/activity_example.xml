@@ -8,11 +8,26 @@
     tools:context=".ExampleActivity">
 
     <Button
-        android:id="@+id/verbose_level_btn"
+        android:id="@+id/verbose_filter_level_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
         android:layout_marginTop="70dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/verbose_level_btn_bg"
+        android:text="@string/verbose_level_filter"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/verbose_level_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="50dp"
         android:background="@drawable/verbose_level_btn_bg"
         android:text="@string/verbose_level"
@@ -20,7 +35,7 @@
         android:textColor="@android:color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/verbose_filter_level_btn" />
 
     <Button
         android:id="@+id/info_level_btn"

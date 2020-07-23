@@ -3,6 +3,7 @@ package cn.shper.tklogger.example
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import cn.shper.tklogger.TKLogger
+import cn.shper.tklogger.example.filter.VerboseLogFilter
 import kotlinx.android.synthetic.main.activity_example.*
 
 /**
@@ -20,16 +21,22 @@ class ExampleActivity : AppCompatActivity() {
   }
 
   private fun setupClickListener() {
+    verbose_filter_level_btn.setOnClickListener {
+      TKLogger.addFilter(VerboseLogFilter())
+    }
+
     verbose_level_btn.setOnClickListener {
       TKLogger.v("This is the verbose level log.")
     }
 
-    info_level_btn.setOnClickListener {
-      TKLogger.i("This is the info level log.")
+    debug_level_btn.setOnClickListener {
+      val data = "{\"name\":\"shper\"}"
+
+      TKLogger.d("This is the debug level log.", data)
     }
 
-    debug_level_btn.setOnClickListener {
-      TKLogger.d("This is the debug level log.")
+    info_level_btn.setOnClickListener {
+      TKLogger.i("This is the info level log.")
     }
 
     warning_level_btn.setOnClickListener {

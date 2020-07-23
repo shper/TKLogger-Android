@@ -2,6 +2,7 @@ package cn.shper.tklogger.destination
 
 import android.content.Context
 import cn.shper.tklogger.TKLogLevel
+import cn.shper.tklogger.model.TKLogModel
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -22,28 +23,11 @@ class TKLogDiskDestination(private val context: Context) : TKLogBaseDestination(
     createLogDir()
   }
 
-  override fun handlerLog(level: TKLogLevel,
-                          message: String?,
-                          internalMessage: String?,
-                          threadName: String,
-                          clazzName: String,
-                          fileName: String,
-                          functionName: String,
-                          line: Int): String? {
-
-    val logStr = super.handlerLog(level,
-                                  message,
-                                  internalMessage,
-                                  threadName,
-                                  clazzName,
-                                  fileName,
-                                  functionName,
-                                  line)
+  override fun handlerLog(tkLog: TKLogModel) {
+    val logStr = formatLog(tkLog)
     logStr?.let {
       saveToFile(it)
     }
-
-    return logStr
   }
 
   fun createLogDir() {

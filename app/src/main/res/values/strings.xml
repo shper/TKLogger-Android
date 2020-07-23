@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TKLogger Example Android</string>
 
+    <string name="verbose_level_filter">Add Verbose Filter</string>
     <string name="verbose_level">Verbose Level Log</string>
     <string name="info_level">Info Level Log</string>
     <string name="debug_level">Debug Level Log</string>
