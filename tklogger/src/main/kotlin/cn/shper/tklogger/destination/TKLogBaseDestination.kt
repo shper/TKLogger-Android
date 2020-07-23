@@ -20,9 +20,6 @@ abstract class TKLogBaseDestination {
 
   open var format = "%Dyyyy-MM-dd HH:mm:ss %C %L/%T %t %c.%f:%l - %M %I"
 
-  /// runs in own serial background thread for better performance
-  open var asynchronously = true
-
   /// set custom log level words for each level
   open var levelString = LevelString()
 

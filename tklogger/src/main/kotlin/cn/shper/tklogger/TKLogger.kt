@@ -26,7 +26,7 @@ object TKLogger {
 
   private var destinations = HashSet<TKLogBaseDestination>()
 
-  private var filters = HashSet<TKLogBaseFilter>()
+  private var filters = ArrayList<TKLogBaseFilter>()
 
   fun setup(tag: String = "TKLogger",
             level: TKLogLevel = TKLogLevel.VERBOSE,
@@ -53,6 +53,15 @@ object TKLogger {
     }
 
     filters.add(filter)
+    return true
+  }
+
+  fun addFilter(filter: TKLogBaseFilter, priority: Int): Boolean {
+    if (filters.contains(filter)) {
+      return false
+    }
+
+    filters.add(priority, filter)
     return true
   }
 
@@ -101,22 +110,18 @@ object TKLogger {
       this.lineNum = stackTraceElement.lineNumber
     }
 
-    // Use filters to process logs
-    filters.forEach { filter ->
-      tkLog = filter.handleFilter(tkLog)
+    threadPool?.execute {
+      // Use filters to process logs
+      filters.forEach { filter ->
+        tkLog = filter.handleFilter(tkLog)
 
-      if (tkLog.isIgnore) {
-        return
-      }
-    }
-
-    // dispatch the logs to destination
-    destinations.forEach { destination ->
-      if (destination.asynchronously) {
-        threadPool?.execute {
-          destination.handlerLog(tkLog)
+        if (tkLog.isIgnore) {
+          return@execute
         }
-      } else {
+      }
+
+      // dispatch the logs to destination
+      destinations.forEach { destination ->
         destination.handlerLog(tkLog)
       }
     }
