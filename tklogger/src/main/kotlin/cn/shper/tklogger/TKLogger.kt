@@ -22,18 +22,16 @@ object TKLogger {
 
   var minLevel = TKLogLevel.VERBOSE
 
-  var threadPool: ThreadPoolExecutor? = null
-
   private var destinations = HashSet<TKLogBaseDestination>()
 
   private var filters = ArrayList<TKLogBaseFilter>()
 
   fun setup(tag: String = "TKLogger",
             level: TKLogLevel = TKLogLevel.VERBOSE,
-            threadPool: ThreadPoolExecutor = ThreadPoolUtils.createThreadPool()) {
+            threadPool: ThreadPoolExecutor? = null) {
     this.loggerTag = tag
     this.minLevel = level
-    this.threadPool = threadPool
+    ThreadPoolUtils.threadPool = threadPool
   }
 
   /** Destination */
@@ -110,7 +108,7 @@ object TKLogger {
       this.lineNum = stackTraceElement.lineNumber
     }
 
-    threadPool?.execute {
+    ThreadPoolUtils.threadPool?.execute {
       // Use filters to process logs
       filters.forEach { filter ->
         tkLog = filter.handleFilter(tkLog)

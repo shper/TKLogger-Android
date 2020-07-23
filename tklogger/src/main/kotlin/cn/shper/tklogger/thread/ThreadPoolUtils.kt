@@ -20,6 +20,19 @@ object ThreadPoolUtils {
 
   private const val KEEP_ALIVE: Long = 30
 
+  var threadPool: ThreadPoolExecutor? = null
+    get() {
+      if (field == null) {
+        field = createThreadPool()
+      }
+      return field
+    }
+    set(value) {
+      if (value == null) {
+        field = createThreadPool()
+      }
+    }
+
   private val numberOfCPUCores: Int
     get() {
       return try {
@@ -44,7 +57,11 @@ object ThreadPoolUtils {
   }
 
   fun createThreadPool(): ThreadPoolExecutor {
-    return ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, LinkedBlockingQueue())
+    return ThreadPoolExecutor(CORE_POOL_SIZE,
+                              MAX_POOL_SIZE,
+                              KEEP_ALIVE,
+                              TimeUnit.SECONDS,
+                              LinkedBlockingQueue())
   }
 
 }
