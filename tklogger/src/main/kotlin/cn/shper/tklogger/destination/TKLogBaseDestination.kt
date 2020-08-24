@@ -86,8 +86,8 @@ abstract class TKLogBaseDestination {
     return text
   }
 
-  fun paddedString(str1: String? = "", str2: String): String {
-    var str = str1 + str2
+  fun paddedString(str1: String?, str2: String?): String {
+    var str = (str1 ?: "") + (str2 ?: "")
     if (str == " ") {
       str = ""
     }

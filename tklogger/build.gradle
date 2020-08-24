@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 ext {
-    version_name = "0.0.3"
+    version_name = "0.0.4"
     version_code = 100000
 }
 
