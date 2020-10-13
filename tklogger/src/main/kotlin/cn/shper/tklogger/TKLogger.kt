@@ -111,16 +111,25 @@ object TKLogger {
     ThreadPoolUtils.threadPool?.execute {
       // Use filters to process logs
       filters.forEach { filter ->
-        tkLog = filter.handleFilter(tkLog)
-
-        if (tkLog.isIgnore) {
-          return@execute
+        try {
+          tkLog = filter.handleFilter(tkLog)
+          if (tkLog.isIgnore) {
+            return@execute
+          }
+        } catch (e: Exception) {
+          e.printStackTrace()
         }
       }
 
       // dispatch the logs to destination
       destinations.forEach { destination ->
-        destination.handlerLog(tkLog)
+        ThreadPoolUtils.threadPool?.execute {
+          try {
+            destination.handlerLog(tkLog)
+          } catch (e: Exception) {
+            e.printStackTrace()
+          }
+        }
       }
     }
   }

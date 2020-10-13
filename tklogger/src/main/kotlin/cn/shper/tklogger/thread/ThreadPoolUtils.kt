@@ -33,6 +33,23 @@ object ThreadPoolUtils {
       }
     }
 
+  private val CPU_FILTER: FileFilter
+    get() {
+      return FileFilter { pathname ->
+        val path = pathname.name
+        //regex is slow, so checking char by char.
+        if (path.startsWith("cpu")) {
+          for (i in 3 until path.length) {
+            if (path[i] < '0' || path[i] > '9') {
+              return@FileFilter false
+            }
+          }
+          return@FileFilter true
+        }
+        false
+      }
+    }
+
   private val numberOfCPUCores: Int
     get() {
       return try {
@@ -41,20 +58,6 @@ object ThreadPoolUtils {
         DEVICE_INFO_UNKNOWN
       }
     }
-
-  private val CPU_FILTER = FileFilter { pathname ->
-    val path = pathname.name
-    //regex is slow, so checking char by char.
-    if (path.startsWith("cpu")) {
-      for (i in 3 until path.length) {
-        if (path[i] < '0' || path[i] > '9') {
-          return@FileFilter false
-        }
-      }
-      return@FileFilter true
-    }
-    false
-  }
 
   fun createThreadPool(): ThreadPoolExecutor {
     return ThreadPoolExecutor(CORE_POOL_SIZE,
