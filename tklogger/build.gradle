@@ -5,8 +5,8 @@ apply plugin: 'kotlin-android-extensions'
 ext {
     version_name = "1.0.0"
     version_code = 10000
-    groupId = "cn.shper.plugin"
-    artifactId = "tk-maven"
+    groupId = "cn.shper"
+    artifactId = "tklogger"
 }
 
 android {
