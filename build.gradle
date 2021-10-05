@@ -4,15 +4,15 @@ buildscript {
 
     repositories {
         google()
-        jcenter()
-        maven{ url 'https://dl.bintray.com/shper/maven' }
+        mavenCentral()
     }
 
     dependencies {
         classpath "com.android.tools.build:gradle:4.0.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
-        classpath 'cn.shper.plugin:tk-maven:1.1.0'
+//        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.4.10.2"
+        classpath 'cn.shper.plugin:tk-maven:2.1.0'
     }
 
     configurations.all {
@@ -24,7 +24,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     configurations.all {

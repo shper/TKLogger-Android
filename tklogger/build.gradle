@@ -3,8 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 ext {
-    version_name = "0.1.0"
-    version_code = 100000
+    version_name = "1.0.0"
+    version_code = 10000
+    groupId = "cn.shper.plugin"
+    artifactId = "tk-maven"
 }
 
 android {
@@ -46,21 +48,51 @@ dependencies {
 
 }
 
+//apply from: 'publish.gradle'
 apply plugin: 'tk-maven'
 tkmaven {
-    groupId = "cn.shper"
-    artifactId = "tklogger"
+    groupId = project.groupId
+    artifactId = project.artifactId
     version = version_name
 
-    bintray {
-        repo = "maven"
-        userOrg = "shper"
-        name = "TKLogger"
-        desc = "Simple and powerful logger for android"
-        websiteUrl = "https://www.shper.cn"
-        vcsUrl = "https://github.com/shper"
+    signing = true
+
+    repository {
+        url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
 
         sourcesJar = true
         javadocJar = true
+    }
+
+    snapshotRepository {
+        url = "./../.repo-snapshot"
+
+        authable = false
+        sourcesJar = true
+        javadocJar = true
+    }
+
+    pom {
+        name = project.artifactId
+        description = "Simple and powerful logger for android"
+        url = "https://github.com/shper/TKLogger-Android"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+        developers {
+            developer {
+                id = "me@shper.cn"
+                name = "shper"
+                email = "me@shper.cn"
+            }
+        }
+        scm {
+            connection = "scm:git:github.com/shper/TKLogger-Android"
+            developerConnection = "scm:git:ssh://github.com/shper/TKLogger-Android"
+            url = "https://github.com/shper/TKLogger-Android/tree/master"
+        }
     }
 }
