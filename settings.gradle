@@ -1,3 +1,2 @@
 include ':tklogger'
 include ':app'
-rootProject.name = "TKLogger-Android"
