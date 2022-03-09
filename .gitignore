@@ -8,3 +8,5 @@
 .externalNativeBuild
 .cxx
 .DS_Store
+.repo
+.repo-snapshot
