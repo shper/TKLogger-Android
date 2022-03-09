@@ -16,6 +16,7 @@ class TKLogModel {
   var level: TKLogLevel = TKLogLevel.VERBOSE
   var message: String? = null
   var internalMessage: String? = null
+  var throwableMessage: String? = null
   var clazzName: String? = null
   var fileName: String? = null
   var functionName: String? = null

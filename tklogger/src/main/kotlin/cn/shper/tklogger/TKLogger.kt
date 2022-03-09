@@ -1,5 +1,6 @@
 package cn.shper.tklogger
 
+import android.util.Log
 import androidx.annotation.Keep
 import cn.shper.tklogger.destination.TKLogBaseDestination
 import cn.shper.tklogger.filter.TKLogBaseFilter
@@ -65,32 +66,32 @@ object TKLogger {
 
   /** Levels */
 
-  fun v(message: String? = null, internalMessage: String? = null) {
-    dispatchLog(TKLogLevel.VERBOSE, message, internalMessage)
+  fun v(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+    dispatchLog(TKLogLevel.VERBOSE, message, internalMessage, tr)
   }
 
-  fun d(message: String? = null, internalMessage: String? = null) {
-    dispatchLog(TKLogLevel.DEBUG, message, internalMessage)
-
+  fun d(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+    dispatchLog(TKLogLevel.DEBUG, message, internalMessage, tr)
   }
 
-  fun i(message: String? = null, internalMessage: String? = null) {
-    dispatchLog(TKLogLevel.INFO, message, internalMessage)
+  fun i(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+    dispatchLog(TKLogLevel.INFO, message, internalMessage, tr)
   }
 
-  fun w(message: String? = null, internalMessage: String? = null) {
-    dispatchLog(TKLogLevel.WARN, message, internalMessage)
+  fun w(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+    dispatchLog(TKLogLevel.WARN, message, internalMessage, tr)
   }
 
-  fun e(message: String? = null, internalMessage: String? = null) {
-    dispatchLog(TKLogLevel.ERROR, message, internalMessage)
+  fun e(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+    dispatchLog(TKLogLevel.ERROR, message, internalMessage, tr)
   }
 
   /** Inner Function */
 
   private fun dispatchLog(level: TKLogLevel,
                           msg: String? = null,
-                          interMsg: String? = null) {
+                          interMsg: String? = null,
+                          tr: Throwable? = null) {
 
     if (level.ordinal < minLevel.ordinal) {
       return
@@ -102,6 +103,9 @@ object TKLogger {
       this.threadName = getThreadName()
       this.message = msg
       this.internalMessage = interMsg
+      tr?.let {
+        this.throwableMessage = Log.getStackTraceString(it)
+      }
       this.clazzName = stackTraceElement.className
       this.fileName = stackTraceElement.fileName
       this.functionName = stackTraceElement.methodName
