@@ -10,20 +10,19 @@ import cn.shper.tklogger.destination.TKLogDiskDestination
  * EMail : me@shper.cn
  * Date : 2020/6/11
  */
-class ExampleApplication: Application() {
+class ExampleApplication : Application() {
 
-  override fun onCreate() {
-    super.onCreate()
+    override fun onCreate() {
+        super.onCreate()
 
-    setupTKLogger()
-  }
+        setupTKLogger()
+    }
 
-  private fun setupTKLogger() {
-    // Init to TKLogger
-    TKLogger.setup()
-
-    TKLogger.addDestination(TKLogConsoleDestination())
-    TKLogger.addDestination(TKLogDiskDestination(this))
-  }
+    private fun setupTKLogger() {
+        // Init to TKLogger
+        TKLogger.setup("TKLogger-Example")
+            .addDestination(TKLogConsoleDestination())
+            .addDestination(TKLogDiskDestination(this))
+    }
 
 }

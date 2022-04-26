@@ -19,159 +19,169 @@ import kotlin.collections.HashSet
 @Keep
 object TKLogger {
 
-  var loggerTag = "TKLogger"
+    var loggerTag = "TKLogger"
 
-  var minLevel = TKLogLevel.VERBOSE
+    var minLevel = TKLogLevel.VERBOSE
 
-  private var destinations = HashSet<TKLogBaseDestination>()
+    private var destinations = HashSet<TKLogBaseDestination>()
 
-  private var filters = ArrayList<TKLogBaseFilter>()
+    private var filters =  mutableListOf<TKLogBaseFilter>()
 
-  fun setup(tag: String = "TKLogger",
-            level: TKLogLevel = TKLogLevel.VERBOSE,
-            threadPool: ThreadPoolExecutor? = null) {
-    this.loggerTag = tag
-    this.minLevel = level
-    ThreadPoolUtils.threadPool = threadPool
-  }
+    fun setup(tag: String = "TKLogger"): TKLogger {
+        this.loggerTag = tag
 
-  /** Destination */
-  fun addDestination(destination: TKLogBaseDestination): Boolean {
-    if (destinations.contains(destination)) {
-      return false
+        return this
     }
 
-    destinations.add(destination)
-    return true
-  }
+    fun level(level: TKLogLevel): TKLogger {
+        this.minLevel = level
 
-  /** Filter */
-  fun addFilter(filter: TKLogBaseFilter): Boolean {
-    if (filters.contains(filter)) {
-      return false
+        return this
     }
 
-    filters.add(filter)
-    return true
-  }
+    fun threadPool(threadPool: ThreadPoolExecutor): TKLogger {
+        ThreadPoolUtils.threadPool = threadPool
 
-  fun addFilter(filter: TKLogBaseFilter, priority: Int): Boolean {
-    if (filters.contains(filter)) {
-      return false
+        return this
     }
 
-    filters.add(priority, filter)
-    return true
-  }
-
-  /** Levels */
-
-  fun v(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
-    dispatchLog(TKLogLevel.VERBOSE, message, internalMessage, tr)
-  }
-
-  fun d(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
-    dispatchLog(TKLogLevel.DEBUG, message, internalMessage, tr)
-  }
-
-  fun i(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
-    dispatchLog(TKLogLevel.INFO, message, internalMessage, tr)
-  }
-
-  fun w(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
-    dispatchLog(TKLogLevel.WARN, message, internalMessage, tr)
-  }
-
-  fun e(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
-    dispatchLog(TKLogLevel.ERROR, message, internalMessage, tr)
-  }
-
-  /** Inner Function */
-
-  private fun dispatchLog(level: TKLogLevel,
-                          msg: String? = null,
-                          interMsg: String? = null,
-                          tr: Throwable? = null) {
-
-    if (level.ordinal < minLevel.ordinal) {
-      return
-    }
-
-    val stackTraceElement = getCallerStackTraceElement()
-    var tkLog = TKLogModel().apply {
-      this.level = level
-      this.threadName = getThreadName()
-      this.message = msg
-      this.internalMessage = interMsg
-      tr?.let {
-        this.throwableMessage = Log.getStackTraceString(it)
-      }
-      this.clazzName = stackTraceElement.className
-      this.fileName = stackTraceElement.fileName
-      this.functionName = stackTraceElement.methodName
-      this.lineNum = stackTraceElement.lineNumber
-    }
-
-    ThreadPoolUtils.threadPool?.execute {
-      // Use filters to process logs
-      filters.forEach { filter ->
-        try {
-          tkLog = filter.handleFilter(tkLog)
-          if (tkLog.isIgnore) {
-            return@execute
-          }
-        } catch (e: Exception) {
-          e.printStackTrace()
+    /** Destination */
+    fun addDestination(destination: TKLogBaseDestination): TKLogger {
+        if (destinations.contains(destination)) {
+            return this
         }
-      }
 
-      // dispatch the logs to destination
-      destinations.forEach { destination ->
+        destinations.add(destination)
+        return this
+    }
+
+    /** Filter */
+    fun addFilter(filter: TKLogBaseFilter): TKLogger {
+        if (filters.contains(filter)) {
+            return this
+        }
+
+        filters.add(filter)
+        return this
+    }
+
+    fun addFilter(filter: TKLogBaseFilter, priority: Int): TKLogger {
+        if (filters.contains(filter)) {
+            return this
+        }
+
+        filters.add(priority, filter)
+        return this
+    }
+
+    /** Levels */
+
+    fun v(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+        dispatchLog(TKLogLevel.VERBOSE, message, internalMessage, tr)
+    }
+
+    fun d(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+        dispatchLog(TKLogLevel.DEBUG, message, internalMessage, tr)
+    }
+
+    fun i(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+        dispatchLog(TKLogLevel.INFO, message, internalMessage, tr)
+    }
+
+    fun w(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+        dispatchLog(TKLogLevel.WARN, message, internalMessage, tr)
+    }
+
+    fun e(message: String? = null, internalMessage: String? = null, tr: Throwable? = null) {
+        dispatchLog(TKLogLevel.ERROR, message, internalMessage, tr)
+    }
+
+    /** Inner Function */
+
+    private fun dispatchLog(level: TKLogLevel,
+                            msg: String? = null,
+                            interMsg: String? = null,
+                            tr: Throwable? = null) {
+
+        if (level.ordinal < minLevel.ordinal) {
+            return
+        }
+
+        val stackTraceElement = getCallerStackTraceElement()
+        var tkLog = TKLogModel().apply {
+            this.level = level
+            this.threadName = getThreadName()
+            this.message = msg
+            this.internalMessage = interMsg
+            tr?.let {
+                this.throwableMessage = Log.getStackTraceString(it)
+            }
+            this.clazzName = stackTraceElement.className
+            this.fileName = stackTraceElement.fileName
+            this.functionName = stackTraceElement.methodName
+            this.lineNum = stackTraceElement.lineNumber
+        }
+
         ThreadPoolUtils.threadPool?.execute {
-          try {
-            destination.handlerLog(tkLog)
-          } catch (e: Exception) {
-            e.printStackTrace()
-          }
+            // Use filters to process logs
+            filters.forEach { filter ->
+                try {
+                    tkLog = filter.handleFilter(tkLog)
+                    if (tkLog.isIgnore) {
+                        return@execute
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            // dispatch the logs to destination
+            destinations.forEach { destination ->
+                ThreadPoolUtils.threadPool?.execute {
+                    try {
+                        destination.handlerLog(tkLog)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
         }
-      }
-    }
-  }
-
-  private fun getThreadName(): String {
-    var threadName = Thread.currentThread().name
-    if (threadName.toLowerCase(Locale.ROOT) == "main") {
-      threadName = ""
     }
 
-    return threadName
-  }
-
-  private fun getCallerStackTraceElement(): StackTraceElement {
-    val stackTraces = Thread.currentThread().stackTrace
-    var callerStackTrace: StackTraceElement? = null
-
-    run breaking@{
-      stackTraces.forEachIndexed { index, stackTraceElement ->
-        if (stackTraceElement.className.startsWith(TKLogger.javaClass.name)
-          && index < stackTraces.size
-          && !stackTraces[index + 1].className.startsWith(TKLogger.javaClass.name)) {
-          callerStackTrace = stackTraces[index + 1]
-          return@breaking
+    private fun getThreadName(): String {
+        var threadName = Thread.currentThread().name
+        if (threadName.toLowerCase(Locale.ROOT) == "main") {
+            threadName = ""
         }
-      }
+
+        return threadName
     }
 
-    var clazzName = callerStackTrace?.className
-    clazzName = clazzName?.substring(clazzName.lastIndexOf(".") + 1)
+    private fun getCallerStackTraceElement(): StackTraceElement {
+        val stackTraces = Thread.currentThread().stackTrace
+        var callerStackTrace: StackTraceElement? = null
 
-    var fileName = callerStackTrace?.fileName
-    fileName = fileName?.substring(0, fileName.lastIndexOf("."))
+        run breaking@{
+            stackTraces.forEachIndexed { index, stackTraceElement ->
+                if (stackTraceElement.className.startsWith(TKLogger.javaClass.name)
+                    && index < stackTraces.size
+                    && !stackTraces[index + 1].className.startsWith(TKLogger.javaClass.name)) {
+                    callerStackTrace = stackTraces[index + 1]
+                    return@breaking
+                }
+            }
+        }
 
-    return StackTraceElement(clazzName,
-                             callerStackTrace?.methodName + "()",
-                             fileName,
-                             callerStackTrace?.lineNumber ?: 0)
-  }
+        var clazzName = callerStackTrace?.className
+        clazzName = clazzName?.substring(clazzName.lastIndexOf(".") + 1)
+
+        var fileName = callerStackTrace?.fileName
+        fileName = fileName?.substring(0, fileName.lastIndexOf("."))
+
+        return StackTraceElement(clazzName,
+                                 callerStackTrace?.methodName + "()",
+                                 fileName,
+                                 callerStackTrace?.lineNumber ?: 0)
+    }
 
 }

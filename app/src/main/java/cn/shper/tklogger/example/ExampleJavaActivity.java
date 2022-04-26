@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import cn.shper.tklogger.javakit.TKLogger;
+
 /**
  * Author: Shper
  * Email: me@shper.cn
@@ -12,9 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
  */
 public class ExampleJavaActivity extends AppCompatActivity {
 
-  @Override
-  protected void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-  }
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        TKLogger.d("");
+    }
 
 }
